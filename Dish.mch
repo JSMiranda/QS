@@ -4,14 +4,13 @@ MACHINE				Dish
 
 SETS				DISHES, BOOL = {true, false}
 
-VARIABLES			dishes,			
-					description : dishes --> DESCRIPTIONS,
-					name : dishes --> NAMES // verificar tipo de funcao (e se parte do conjunto DISHES ou dishes
-					isVegetarian : dishes --> BOOL
+VARIABLES			dishes,	description, name, isVegetarian
 
-INVARIANT			dishes <: DISHES
-		// para todo o dish em dishes, existe name : NAME , ... (etc)
-
+INVARIANT			dishes <: DISHES &         
+					description : dishes --> DESCRIPTIONS &
+					name : dishes --> NAMES &				  // verificar tipo de funcao (e se parte do conjunto DISHES ou dishes
+					isVegetarian : dishes --> BOOL 
+					
 INITIALISATION		dishes := {} 
 
 OPERATIONS
@@ -57,38 +56,3 @@ OPERATIONS
 					END
 
 END
-
-
-
-
-
-
-
-/*
-
-// CLIENTS, DISHES, RESTAURANTS, TRAYS
-
-MACHINE				Dish
-
-SETS				DISHES, BOOL = {true, false}
-
-VARIABLES			description : DISHES --> DESCRIPTIONS
-					name : DISHES --> NAMES // 
-					isVegetarian : DISHES --> BOOL
-
-INITIALISATION		DISHES <: {}  // é assim? pode ser = em vez de <: ?
-
-OPERATIONS
-					newDish(dd) =  // como tratar do input (name, desc, bool) ?
-					PRE dd : DISHES // o que significa o : (ver comentario em *)
-					THEN 
-					END
-
-
-					removeDish
-					getDishName
-					getDishDescription
-					isVegetarianDish
-
-END
-*/
