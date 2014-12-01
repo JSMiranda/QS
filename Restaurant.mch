@@ -1,20 +1,24 @@
 // VER DUVIDAS DE Dish!
 
-MACHINE				Restaurant
+MACHINE			Restaurant
 
-SEES				Dish
+SEES			Dish
 
-SETS				RESTAURANTS, RESTNAMES, RESTADDRESSSES
+SETS			RESTAURANTS, RESTNAMES, RESTADDRESSSES
 
-VARIABLES			restaurants,
-				address : restaurants --> RESTADDRESSSES, // TODO: Trocar isto para o invariante
-				name : restaurants --> RESTNAMES,
-				prices : dishes --> NUMBER
+CONSTANT		maxprice := 20  								//verificar sintaxe
 
+VARIABLES		restaurants, address, name, prices, rdishes
+				
 INVARIANT
-				restaurants <: RESTAURANTS
+				rdishes: restaurants <--> dishes   				//será?
+				restaurants <: RESTAURANTS &
+				address : restaurants --> RESTADDRESSSES & 		
+				name : restaurants --> RESTNAMES &			
+				prices : rdishes --> {0..maxprice} &			//verificar sintaxe
+				!(r).(r : dom(rdishes) => (card(rdishes <| {r})) : {5..15})   //verificar sintaxe
 
-INITIALISATION
+INITIALISATION	restaurants := {}
 
 OPERATIONS
 				newRestaurant
