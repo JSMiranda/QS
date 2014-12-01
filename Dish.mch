@@ -2,7 +2,7 @@
 
 MACHINE				Dish
 
-SETS				DISHES, BOOL = {true, false}
+SETS				DISHES, NAMES, DESCRIPTIONS, BOOL = {true, false}
 
 VARIABLES			dishes,	description, name, isVegetarian
 
