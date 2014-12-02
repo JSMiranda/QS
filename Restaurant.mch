@@ -6,7 +6,7 @@ SEES			Dish
 
 SETS			RESTAURANTS, RESTNAMES, RESTADDRESSSES
 
-VARIABLES		restaurants, address, name, prices, rdishes
+VARIABLES		restaurants, address, name, prices, rdishes, rIsVegetarian
 				
 INVARIANT
 				rdishes: restaurants <-> dishes   				//será?
@@ -15,6 +15,7 @@ INVARIANT
 				name : restaurants --> RESTNAMES &			
 				prices : rdishes --> 0..maxprice &			//verificar sintaxe
 				!(r).(r : dom(rdishes) => (card({r}<|rdishes)) : 5..15)
+				rIsVegetarian : restaurants --> BOOL
 
 INITIALISATION	restaurants := {}
 
@@ -24,9 +25,26 @@ OPERATIONS
 				removeDishFromRestaurant
 				changePrice
 				getDishPrice
-				getVegetarianRestaurant
-				setVegetarianRestaurant
-				getRestaurantName
+
+				bb <-- isVegetarianRestaurant(rr) =
+				PRE rr : restaurants
+				THEN
+					bb := isVegetarian (rr)
+				END;
+
+				setVegetarianRestaurant(rr, bb) =
+				PRE  rr : restaurants
+					 & bb : BOOL
+				THEN
+					 bb <+ {rr |-> rIsVegetarian}
+				END;
+
+				name <-- getRestaurantName(rr) =
+				PRE rr : restaurants
+				THEN
+					name := name(rr)
+				END;
+
 				getRestaurantAddress
 				getRestaurantsDish
 				getDishRestaurant // retorna o "menu" do rest
