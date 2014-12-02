@@ -29,7 +29,7 @@ OPERATIONS
 					& dd : rdishes
 					& pp : 0..maxprice
 				THEN
-					pp <+ {rr |-> rdishes(dd)}
+					pp <+ {rr |-> dd}
 				END;
 
 				pp <-- getDishPrice(rr, dd) =
@@ -58,8 +58,19 @@ OPERATIONS
 					name := name(rr)
 				END;
 
-				getRestaurantAddress
-				getRestaurantsDish
+				addr <-- getRestaurantAddress(rr) =
+				PRE rr : restaurants
+				THEN
+					addr := address(rr)
+				END;
+
+				lrr <-- getRestaurantsDish(dd) =
+				PRE
+				THEN
+
+				END;
+
+
 				getDishRestaurant // retorna o "menu" do rest
 
 END
