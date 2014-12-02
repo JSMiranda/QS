@@ -23,13 +23,26 @@ OPERATIONS
 				newRestaurant
 				addDishToRestaurant
 				removeDishFromRestaurant
-				changePrice
-				getDishPrice
+
+				changePrice(rr,dd,pp) = 
+				PRE rr : restaurants
+					& dd : rdishes
+					& pp : 0..maxprice
+				THEN
+					pp <+ {rr |-> rdishes(dd)}
+				END;
+
+				pp <-- getDishPrice(rr, dd) =
+				PRE rr : restaurants
+					dd : rdishes
+				THEN
+					pp := prices(dd)
+				END;
 
 				bb <-- isVegetarianRestaurant(rr) =
 				PRE rr : restaurants
 				THEN
-					bb := isVegetarian (rr)
+					bb := isVegetarian(rr)
 				END;
 
 				setVegetarianRestaurant(rr, bb) =
