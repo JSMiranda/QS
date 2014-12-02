@@ -1,22 +1,20 @@
 // VER DUVIDAS DE Dish!
 
-MACHINE			Restaurant
+MACHINE			Restaurant(maxprice)
 
 SEES			Dish
 
 SETS			RESTAURANTS, RESTNAMES, RESTADDRESSSES
 
-CONSTANT		maxprice := 20  								//verificar sintaxe
-
 VARIABLES		restaurants, address, name, prices, rdishes
 				
 INVARIANT
-				rdishes: restaurants <--> dishes   				//será?
+				rdishes: restaurants <-> dishes   				//será?
 				restaurants <: RESTAURANTS &
 				address : restaurants --> RESTADDRESSSES & 		
 				name : restaurants --> RESTNAMES &			
-				prices : rdishes --> {0..maxprice} &			//verificar sintaxe
-				!(r).(r : dom(rdishes) => (card(rdishes <| {r})) : {5..15})   //verificar sintaxe
+				prices : rdishes --> 0..maxprice &			//verificar sintaxe
+				!(r).(r : dom(rdishes) => (card({r}<|rdishes)) : 5..15)
 
 INITIALISATION	restaurants := {}
 
@@ -30,6 +28,7 @@ OPERATIONS
 				setVegetarianRestaurant
 				getRestaurantName
 				getRestaurantAddress
+				getRestaurantsDish
 				getDishRestaurant // retorna o "menu" do rest
 
 END

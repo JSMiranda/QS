@@ -23,20 +23,22 @@ OPERATIONS
 					THEN
 						dishes := dishes \/ {dd} ||
 						name <+ {dd |-> name} ||
-						description <+ {dd |-> desc} || // verificar syntax
+						description <+ {dd |-> desc} ||
 						bool <+ {dd |-> bool}
 					END;
 
-					removeDish(dd) =					// TODO: adicionar a precond dd :/ restaurant.dishes (para todos os rests) & em trays nao pagas! 
-					PRE dd : dishes
+					removeDish(dd) =
+					PRE dd : dishes &
+                                            dd :/ rdishes &
+                                            dd :/ tdishes
 					THEN
 						dishes := dishes - {dd} ||
-						name <- {dd |-> name} ||
-						description <- {dd |-> desc} || // verificar syntax (<- especificamente)
-						bool <- {dd |-> bool}           // e ver se podemos remover aqui,
-					END;                                // e se faz sentido definir o invariante
-														// por causa disto
+						name <<| dd ||
+						description <<| dd ||
+						bool <<| dd
+					END;
 
+					
 					name <-- getDishName(dd) =
 					PRE dd : dishes            // ou DISHES e "lançar excepcao" caso /: a dishes ?
 					THEN
