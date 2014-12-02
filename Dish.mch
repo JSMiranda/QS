@@ -8,13 +8,13 @@ VARIABLES			dishes,	description, name, isVegetarian
 
 INVARIANT			dishes <: DISHES &         
 					description : dishes --> DESCRIPTIONS &
-					name : dishes --> NAMES &				  // verificar tipo de funcao (e se parte do conjunto DISHES ou dishes
+					name : dishes --> NAMES &				 
 					isVegetarian : dishes --> BOOL 
 					
 INITIALISATION		dishes := {} 
 
 OPERATIONS
-					newDish(dd, name, desc, bool) =   // verificar se se pode usar "bool"
+					newDish(dd, name, desc, bool) =   
 					PRE dd : DISHES
 						& dd /: dishes
 						& name : NAMES

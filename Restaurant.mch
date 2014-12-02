@@ -33,3 +33,7 @@ OPERATIONS
 				getDishRestaurant // retorna o "menu" do rest
 
 END
+
+
+
+// f: x -> Y   com  ran(f) = y   no rest
