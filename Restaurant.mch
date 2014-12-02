@@ -6,7 +6,7 @@ SEES			Dish
 
 SETS			RESTAURANTS, RESTNAMES, RESTADDRESSSES
 
-VARIABLES		restaurants, address, name, prices, rdishes
+VARIABLES		restaurants, address, name, prices, rdishes, rIsVegetarian
 				
 INVARIANT
 				rdishes: restaurants <-> dishes   				//será?
@@ -15,6 +15,7 @@ INVARIANT
 				name : restaurants --> RESTNAMES &			
 				prices : rdishes --> 0..maxprice &			//verificar sintaxe
 				!(r).(r : dom(rdishes) => (card({r}<|rdishes)) : 5..15)
+				rIsVegetarian : restaurants --> BOOL
 
 INITIALISATION	restaurants := {}
 
@@ -43,7 +44,8 @@ OPERATIONS
 							pp: {0..maxprice}
 							!(rr).(rr:restaurants) => ran(card(rdishes)) < 15    //prob wrong, n permitir adição qd size da lista for =15
 					
-					THEN	//rdishes + o par(rr,dd)    again, como manusear a lista combinada? 
+					THEN	//rdishes + o par(rr,dd) ||   again, como manusear a lista combinada? 
+							price <+ {rdishes(rr,dd) |-> pp}
 					
 					END;
 					
@@ -65,6 +67,41 @@ OPERATIONS
 				setVegetarianRestaurant
 				getRestaurantName
 				
+
+				changePrice(rr,dd,pp) = 
+				PRE rr : restaurants
+					& dd : rdishes
+					& pp : 0..maxprice
+				THEN
+					pp <+ {rr |-> rdishes(dd)}
+				END;
+
+				pp <-- getDishPrice(rr, dd) =
+				PRE rr : restaurants
+					dd : rdishes
+				THEN
+					pp := prices(dd)
+				END;
+
+				bb <-- isVegetarianRestaurant(rr) =
+				PRE rr : restaurants
+				THEN
+					bb := isVegetarian(rr)
+				END;
+
+				setVegetarianRestaurant(rr, bb) =
+				PRE  rr : restaurants
+					 & bb : BOOL
+				THEN
+					 bb <+ {rr |-> rIsVegetarian}
+				END;
+
+				name <-- getRestaurantName(rr) =
+				PRE rr : restaurants
+				THEN
+					name := name(rr)
+				END;
+
 				getRestaurantAddress
 				getRestaurantsDish
 				getDishRestaurant // retorna o "menu" do rest
