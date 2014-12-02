@@ -57,30 +57,20 @@ OPERATIONS
 					THEN	//rdishes - o par (rr,dd)       idem
 					
 					END;
-					
-					
-				
-				changePrice
-				
-				getDishPrice
-				getVegetarianRestaurant
-				setVegetarianRestaurant
-				getRestaurantName
 				
 
 				changePrice(rr,dd,pp) = 
-				PRE rr : restaurants
-					& dd : rdishes
+				PRE {rr |-> dd} : rdishes
 					& pp : 0..maxprice
 				THEN
-					pp <+ {rr |-> dd}
+					prices({rr |-> dd}) := pp
 				END;
 
 				pp <-- getDishPrice(rr, dd) =
 				PRE rr : restaurants
 					dd : rdishes
 				THEN
-					pp := prices(dd)
+					pp := prices({rr |-> dd})
 				END;
 
 				bb <-- isVegetarianRestaurant(rr) =
