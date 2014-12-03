@@ -15,47 +15,48 @@ INVARIANT
 				name : restaurants --> RESTNAMES &			
 				prices : rdishes --> 0..maxprice &			//verificar sintaxe
 				!(r).(r : dom(rdishes) => (card({r}<|rdishes)) : 5..15)
-				rIsVegetarian : restaurants --> BOOL
+				rIsVegetarian : restaurants --> BOOL   //talvez tirar o bool do dish e meter global
 
-INITIALISATION	restaurants := {}
+INITIALISATION	restaurants := {}  //todas as listas teem de ser init a vazio
+				
 
 OPERATIONS	
-				newRestaurant(rr, name, addr, ldish, lprice) =
+				newRestaurant(rr, name, addr, list) =
 					PRE 	rr: RESTAURANTS
 							& rr /: restaurants
 							& name : RESTNAMES
 							& addr : RESTADRESSES
-							& card(ldishes): {5..15}    //not sure
-							& !(p).(p : lprice) => p : {0..maxprice}  //not sure			
+							& !(d).((d : dom(list)) => d : DISHES)
+							& !(p).((p : ran(list)) => p : 0..maxprice)  	
+							& card(list): 5..15    
+									
 					THEN
-							restaurants: restaurants \/ {rr} ||
+							restaurants:= restaurants \/ {rr} ||
 							name <+ {rr |->name} ||
-							address <+ {rr |->addr} ||
-							rdishes: rdishes ^ ldish ||							// n deve ser isto pois rdishes é um par restaurante/dish e ldish sao so pratos
-							prices          // no clue como manusear as lista combinada de restaurantes-dishes e associar um preço aos vares
-							
-					
+							address <+ {rr |->addr} ||					
+							rdishes <+ {rr} * dom(list) ||
+							prices <+ (list><rdishes~)~  ||   	//(restaurante,prato),preço
+							rIsVegetarian <+ {rr|->false}					
 					END;
 				
 			
 				addDishToRestaurant(rr,dd,pp) =
 					PRE		rr: restaurants
 							dd: DISHES
-							pp: {0..maxprice}
-							!(rr).(rr:restaurants) => ran(card(rdishes)) < 15    //prob wrong, n permitir adição qd size da lista for =15
+							pp: 0..maxprice
+							!(rr).((rr:restaurants) => card({rr}<|rdishes) < 15)
 					
-					THEN	//rdishes + o par(rr,dd) ||   again, como manusear a lista combinada? 
-							price <+ {rdishes(rr,dd) |-> pp}
-					
+					THEN	rdishes <+ {rr |-> dd} ||   
+							price <+ {{rr |-> dd} |-> pp}
 					END;
 					
 				removeDishFromRestaurant(rr, dd) =
 					PRE		rr: restaurants
-							dd: DISHEs
-							!(rr).(rr:restaurants) => ran(card(rdishes)) > 5    //prob wrong again
+							dd: DISHES
+							!(rr).((rr:restaurants) => card({rr}<|rdishes) > 5)
 					
-					THEN	//rdishes - o par (rr,dd)       idem
-					
+					THEN	{dd} <<| rdishes  ||   
+							prices |>> {dd} 
 					END;
 				
 
@@ -67,8 +68,7 @@ OPERATIONS
 				END;
 
 				pp <-- getDishPrice(rr, dd) =
-				PRE rr : restaurants
-					dd : rdishes
+				PRE {rr |-> dd} : rdishes
 				THEN
 					pp := prices({rr |-> dd})
 				END;
@@ -76,15 +76,37 @@ OPERATIONS
 				bb <-- isVegetarianRestaurant(rr) =
 				PRE rr : restaurants
 				THEN
-					bb := isVegetarian(rr)
+					bb := rIsVegetarian(rr)
 				END;
 
+				
+				setVegetarianTrue(rr) =
+					PRE 
+						!(d) . (d:ran( {rr}<|rdishes ) => isVeg(d)==true)   // == ?
+					THEN
+							rIsVegetarian <+ {rr |-> true}
+					END;
+					
+				setVegetarianFalse(rr) =
+					PRE
+					THEN
+							rIsVegetarian <+ {r |-> false}
+					END;
+					
+					
 				setVegetarianRestaurant(rr, bb) =
-				PRE  rr : restaurants
-					 & bb : BOOL
-				THEN
-					 bb <+ {rr |-> rIsVegetarian}
+				PRE  rr : restaurants &
+					 bb : BOOL & 
+					 
+					
+				THEN  
+						IF {bb} == {true}  //    é boa ideia separar funçoes?
+						THEN setVegetarianTrue(rr)
+						ELSE setVegetarianFalse(rr)
+					 
 				END;
+				
+				
 
 				name <-- getRestaurantName(rr) =
 				PRE rr : restaurants
@@ -93,20 +115,27 @@ OPERATIONS
 				END;
 
 				addr <-- getRestaurantAddress(rr) =
-				PRE rr : restaurants
+				PRE 	rr : restaurants
 				THEN
-					addr := address(rr)
+						addr := address(rr)
 				END;
 
-				lrr <-- getRestaurantsDish(dd) =
-				PRE
-				THEN
-
+				lrr <-- getRestaurantsDish(dd) =            //Returns the list of the names of the restaurants that serve dish dd, if they exist
+				
+				PRE		dd : DISH
+				THEN	
+						lrr :=ran(dom( (rdishes |> {dd}) ) <| name)
 				END;
 
 
-				getDishRestaurant // retorna o "menu" do rest
-
+				ldd <-- getDishRestaurant(rr) // Returns the list of the dishes served in restaurant rr  
+				PRE 	rr : restaurants
+				
+				THEN	 ldd := rr <| rdishes
+				
+				END
+				
+				//lista é um conjunto (ex: restaurants) ou uma sequencia
 END
 
 
