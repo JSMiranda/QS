@@ -1,0 +1,15 @@
+MACHINE				Tray
+
+SEES		Dish, Restaurant			
+
+SETS				
+
+VARIABLES			
+
+INVARIANT			 
+
+INITIALISATION		
+
+OPERATIONS
+
+END
