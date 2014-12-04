@@ -11,7 +11,6 @@ INVARIANT	trays <: TRAYS &
 			tclient: trays --> CLIENTS &
 			tstatus: trays --> STATUS	&
 			tprice: trays --> NAT	
-			//TODO not sure se é preciso invariantes relacionado com os states, penso q nao
 			
 INITIALISATION	tdishes := {}
 				
@@ -28,7 +27,7 @@ OPERATIONS
 				
 				
 				
-				addDishtoTrayRest(tr,dd)=
+				addDishtoTray(tr,dd)=
 				
 					PRE		tr : trays &
 							dd : dishes &  //TODO  tem de ser um dd em rdishes
@@ -40,7 +39,7 @@ OPERATIONS
 							
 				
 				
-				removeDishFromTrayRest(tr,dd)=
+				removeDishFromTray(tr,dd)=
 				
 					PRE		tr : trays &
 							dd : dishes &  //TODO apenas remover dishes q sejam da tray tr
@@ -50,7 +49,7 @@ OPERATIONS
 					
 					END;
 					
-				checkOutTrayRest(tr) =
+				checkOutTray(tr) =
 					
 					PRE		tr : trays &
 							tstatus(tr) == OPEN
@@ -61,7 +60,7 @@ OPERATIONS
 				
 				
 				
-				payTrayRest(tr) =
+				payTray(tr) =
 				
 					PRE		tr : trays	&
 							tstatus(tr) == CLOSED
@@ -73,7 +72,7 @@ OPERATIONS
 					END;
 					
 					
-				cancelTrayRest(tr) =
+				cancelTray(tr) =
 				
 					PRE		tstatus(tr)==CLOSED \/ tstatus(tr) == OPEN
 					
@@ -87,7 +86,7 @@ OPERATIONS
 					END;
 					
 					
-				pp<--computePriceOfTrayRest(tr) = 
+				pp<--computePriceOfTray(tr) = 
 					
 					PRE	pp : NAT &
 						tr: trays
@@ -95,6 +94,8 @@ OPERATIONS
 					THEN	//TODO sum do min dos dishes de tr
 					
 					END
+				//sigma x. (x pertence S) f(x) 
+				//sigma dd . (dd pertence ldd | min (S))
 				
 
 END

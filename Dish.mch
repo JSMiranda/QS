@@ -28,7 +28,7 @@ OPERATIONS
 						bool <+ {dd |-> bool}
 					END;
 
-					removeDishRest(dd) =
+					removeDish(dd) =
 					PRE dd : dishes &
                         dd :/ rdishes &
                         dd :/ tdishes
@@ -40,19 +40,19 @@ OPERATIONS
 					END;
 
 					
-					name <-- getDishNameRest(dd) =
+					name <-- getDishName(dd) =
 					PRE dd : dishes            
 					THEN
 						name := name(dd)
 					END;
 
-					desc <-- getDishDescriptionRest(dd) =
+					desc <-- getDishDescription(dd) =
 					PRE dd : dishes
 					THEN
 						desc := description(dd)
 					END;
 
-					bb <-- isVegetarianDishRest(dd) =
+					bb <-- isVegetarianDish(dd) =
 					PRE dd : dishes
 					THEN
 						bb := isVegetarian(dd)

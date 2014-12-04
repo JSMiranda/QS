@@ -7,15 +7,14 @@ SEES			Dish
 SETS			RESTAURANTS, RESTNAMES, RESTADDRESSSES
 
 VARIABLES		restaurants, address, name, prices, rdishes, rIsVegetarian
-				
 INVARIANT
-				rdishes: restaurants <-> dishes & 				//será?
+				rdishes: restaurants <-> dishes & 				
 				restaurants <: RESTAURANTS &
 				address : restaurants --> RESTADDRESSSES & 		
 				name : restaurants --> RESTNAMES &			
-				prices : rdishes --> 0..maxprice &			//verificar sintaxe
+				prices : rdishes --> 0..maxprice &			
 				!(r).(r : dom(rdishes) => (card({r}<|rdishes)) : 5..15)
-				rIsVegetarian : restaurants --> BOOL   //talvez tirar o bool do dish e meter global
+				rIsVegetarian : restaurants --> BOOL   
 
 INITIALISATION	restaurants := {}  //todas as listas teem de ser init a vazio ?
 				
@@ -40,7 +39,7 @@ OPERATIONS
 					END;
 				
 			
-				addDishToRestaurantRest(rr,dd,pp) =
+				addDishToRestaurant(rr,dd,pp) =
 					PRE		rr: restaurants
 							dd: DISHES
 							pp: 0..maxprice
@@ -51,7 +50,7 @@ OPERATIONS
 							price <+ {{rr |-> dd} |-> pp}
 					END;
 					
-				removeDishFromRestaurantRest(rr, dd) =
+				removeDishFromRestaurant(rr, dd) =
 					PRE		rr: restaurants
 							dd: DISHES
 							!(rr).((rr:restaurants) => card({rr}<|rdishes) > 5)
@@ -62,7 +61,7 @@ OPERATIONS
 					END;
 				
 
-				changePriceRest(rr,dd,pp) = 
+				changePrice(rr,dd,pp) = 
 				PRE {rr |-> dd} : rdishes
 					& pp : 0..maxprice
 				THEN
@@ -80,49 +79,35 @@ OPERATIONS
 				THEN
 					bb := rIsVegetarian(rr)
 				END;
-
 				
-				setVegetarianTrueRest(rr) =
-					PRE 
-						!(d) . (d:ran( {rr}<|rdishes ) => isVeg(d)==true)   // == ?
-					THEN
-							rIsVegetarian <+ {rr |-> true}
-					END;
 					
-				setVegetarianFalse(rr) =
-					PRE
-					THEN
-							rIsVegetarian <+ {r |-> false}
-					END;
-					
-					
-				setVegetarianRestaurantRest(rr, bb) =
+				setVegetarianRestaurant(rr, bb) =
 				PRE  rr : restaurants &
-					 bb : BOOL & 
+					 bb : BOOL &
+					 ( ({bb} == {true} & !(d) . (d:ran( {rr}<|rdishes ) => isVeg(d)==true) ) ||
+					{bb} == {false} )
 					 
 					
 				THEN  
-						IF {bb} == {true}  //    é boa ideia separar funçoes?
-						THEN setVegetarianTrue(rr)
-						ELSE setVegetarianFalse(rr)
+						rIsVegetarian(rr) := bb
 					 
 				END;
 				
 				
 
-				name <-- getRestaurantNameRest(rr) =
+				name <-- getRestaurantName(rr) =
 				PRE rr : restaurants
 				THEN
 					name := name(rr)
 				END;
 
-				addr <-- getRestaurantAddressRest(rr) =
+				addr <-- getRestaurantAddress(rr) =
 				PRE 	rr : restaurants
 				THEN
 						addr := address(rr)
 				END;
 
-				lrr <-- getRestaurantsDishRest(dd) =            //Returns the list of the names of the restaurants that serve dish dd, if they exist
+				lrr <-- getRestaurantsDish(dd) =            //Returns the list of the names of the restaurants that serve dish dd, if they exist
 				
 				PRE		dd : DISH
 				THEN	
@@ -130,14 +115,14 @@ OPERATIONS
 				END;
 
 
-				ldd <-- getDishRestaurantRest(rr) // Returns the list of the dishes served in restaurant rr  
+				ldd <-- getDishRestaurant(rr) // Returns the list of the dishes served in restaurant rr  
 				PRE 	rr : restaurants
 				
 				THEN	 ldd := rr <| rdishes
 				
 				END
 				
-				//lista é um conjunto (ex: restaurants) ou uma sequencia
+				
 END
 
 

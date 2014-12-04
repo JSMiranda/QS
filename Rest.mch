@@ -2,22 +2,25 @@ MACHINE				Rest
 
 INCLUDES			Dish, Tray, Restaurant
 
-SETS				TOKENS     //TODO cena do maxprice, como fica? aqui ou noutra machine á parte? penso q apenas o restaurante precisa disso
+SETS				TOKENS : NAT    
 
-VARIABLES			tokens
+VARIABLES			tDish, tRestaurant, tTray
 
-INVARIANT			tokens : NAT
+INVARIANT			tDish : DISH &
+					tRestaurant : RESTAURANTS &
+					tTray: TRAYS
 					
-INITIALISATION		tokens := 1
-
+INITIALISATION		
+					//operaçoes iguais é p fazer promote
+					//comportamento dos tokens ta mal é preciso enviar os tokens dos DISHES, RESTAURANTS E ViCE VERSA, escolher um token aleatorio
 OPERATIONS		
 					newDish(name,desc,bool) = 
 					
 						PRE
 					
 						THEN
-								newDishRest(token,name,desc,bool) ||
-								token := token + 1
+								//newDishRest(token,name,desc,bool) ||
+								//token := token + 1   ta mal
 						END;
 					
 					removeDish(dd) =
@@ -25,8 +28,7 @@ OPERATIONS
 						PRE
 					
 						THEN
-								removeDishRest(dd)
-								
+								removeDish(dd)
 					
 						END;
 					
@@ -34,7 +36,7 @@ OPERATIONS
 					
 						PRE
 					
-						THEN name:= getDishNameRest(dd)
+						THEN name:= getDishName(dd)
 					
 						END;
 					
@@ -42,7 +44,7 @@ OPERATIONS
 					
 						PRE
 					
-						THEN desc:= getDishDescriptionRest(dd)
+						THEN desc:= getDishDescription(dd)
 					
 						END;
 					
@@ -50,7 +52,7 @@ OPERATIONS
 					
 						PRE
 					
-						THEN bb:=isVegetarianDishRest(dd)
+						THEN bb:=isVegetarianDish(dd)
 					
 						END;
 					
@@ -58,15 +60,15 @@ OPERATIONS
 					
 						PRE
 					
-						THEN	newRestaurantRest(token,name,addr,list) ||
-								token := token +1
+						THEN	//newRestaurantRest(token,name,addr,list) ||
+								//token := token +1
 						END;
 					
 					addDishToRestaurant(rr,dd,pp) =
 					
 						PRE
 						
-						THEN	addDishToRestaurantRest(rr,dd,pp)
+						THEN	addDishToRestaurantt(rr,dd,pp)
 					
 						END;
 						
@@ -74,7 +76,7 @@ OPERATIONS
 					
 						PRE
 						
-						THEN	removeDishFromRestaurantRest(rr,dd)
+						THEN	removeDishFromRestaurant(rr,dd)
 					
 						END;
 					
@@ -82,7 +84,7 @@ OPERATIONS
 					
 						PRE
 						
-						THEN	changePriceRest(rr,dd,pp)
+						THEN	changePrice(rr,dd,pp)
 					
 						END;
 						
@@ -97,25 +99,25 @@ OPERATIONS
 					
 						PRE
 						
-						THEN	setVegetarianRestaurantRest(rr,bb)
+						THEN	setVegetarianRestaurant(rr,bb)
 					
 						END;
 					
-					res<--isVegetarianRestaurantRest(rr) =
+					res<--isVegetarianRestaurant(rr) =
 						PRE
 						
 						THEN 	res:= isVegetarianRestaurant(rr)
 					
 						END;
 						
-					name<--getRestaurantNameRest(rr)=
+					name<--getRestaurantName(rr)=
 						PRE
 						
 						THEN	name:=	getRestaurantName(rr)
 					
 						END;
 						
-					addr<--getRestaurantAdressRest(rr)=
+					addr<--getRestaurantAdress(rr)=
 						PRE
 						
 						THEN	addr:=getRestaurantAdress(rr)
@@ -125,64 +127,64 @@ OPERATIONS
 					lrr<--getRestaurantDish(rr)=
 						PRE
 						
-						THEN	lrr:= getRestaurantDishRest(rr)
+						THEN	lrr:= getRestaurantDish(rr)
 					
 						END;
 					
 					ldd<--getDishRestaurant(rr)=
 						PRE
 						
-						THEN	ldd:=getDishRestaurantRest(rr)
+						THEN	ldd:=getDishRestaurant(rr)
 					
 						END;
 						
 					newTray(cc)=
 						PRE
 						
-						THEN	newTrayRest(token,cc) ||
-								token := token + 1
+						THEN	//newTrayRest(token,cc) ||
+								//token := token + 1
 					
 						END;
 					
 					addDishTOTray(tr,dd)=
 						PRE
 						
-						THEN	addDishTOTrayRest(tr,dd)
+						THEN	addDishTOTray(tr,dd)
 					
 						END;
 					
 					removeDishFromTray(tr,dd)=
 						PRE
 						
-						THEN	removeDishFromTrayRest(tr,dd)
+						THEN	removeDishFromTray(tr,dd)
 					
 						END;
 						
 					checkOutTray(tr)=
 						PRE
 						
-						THEN	checkOutTrayRest(tr)
+						THEN	checkOutTray(tr)
 					
 						END;
 						
 					payTray(tr)=
 						PRE
 						
-						THEN	payTrayRest(tr)
+						THEN	payTray(tr)
 					
 						END;
 						
 					cancelTray(tr)=
 						PRE
 						
-						THEN	cancelTrayRest(tr)
+						THEN	cancelTray(tr)
 					
 						END;
 					
 					pp<--computePriceOfTray(tr)=
 						PRE
 						
-						THEN	pp := computePriceOfTrayRest(tr)
+						THEN	pp := computePriceOfTray(tr)
 					
 						END
 						
