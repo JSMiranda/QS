@@ -9,8 +9,8 @@ VARIABLES	tdishes, tclient, tstatus, trays, tprice
 INVARIANT	trays <: TRAYS &
 			tdishes: trays <-> dishes &		   
 			tclient: trays --> CLIENTS &
-			tstatus: trays --> STATUS
-			tprice: trays --> NAT
+			tstatus: trays --> STATUS	&
+			tprice: trays --> NAT	
 			//TODO not sure se é preciso invariantes relacionado com os states, penso q nao
 			
 INITIALISATION	tdishes := {}
@@ -32,7 +32,7 @@ OPERATIONS
 				
 					PRE		tr : trays &
 							dd : dishes &  //TODO  tem de ser um dd em rdishes
-							tstatus(tr) == OPEN
+							tstatus(tr) == OPEN	&
 							//TODO dd n pode estar contido nos dishes de tr
 					THEN	tdishes <+ {tr |-> dd}
 					
@@ -63,7 +63,7 @@ OPERATIONS
 				
 				payTrayRest(tr) =
 				
-					PRE		tr : trays
+					PRE		tr : trays	&
 							tstatus(tr) == CLOSED
 					
 					THEN	pp := computePriceofTrayRest(tr) ||
@@ -78,10 +78,10 @@ OPERATIONS
 					PRE		tstatus(tr)==CLOSED \/ tstatus(tr) == OPEN
 					
 					THEN	
-							trays := trays - {tr}			
-							{tr} <<| tdishes
-							{tr} <<| tstatus
-							{tr} <<| tclients
+							trays := trays - {tr}	||		
+							{tr} <<| tdishes	||
+							{tr} <<| tstatus	||
+							{tr} <<| tclients	||
 							{tr} <<| tprice					
 					
 					END;
@@ -89,7 +89,7 @@ OPERATIONS
 					
 				pp<--computePriceOfTrayRest(tr) = 
 					
-					PRE	pp : NAT
+					PRE	pp : NAT &
 						tr: trays
 					
 					THEN	//TODO sum do min dos dishes de tr
