@@ -1,5 +1,3 @@
-// CLIENTS, DISHES, RESTAURANTS, TRAYS
-
 MACHINE				Dish
 
 SETS				DISHES, NAMES, DESCRIPTIONS, BOOL = {true, false}
@@ -18,7 +16,7 @@ OPERATIONS
 					PRE dd : DISHES
 						& dd /: dishes
 						& name : NAMES
-						& name /: names  //TODO tá mal é preciso nao estar nos ran da funçao name
+						& name /: ran(name(dd))  
 						& desc : DESCRIPTIONS
 						& bool : BOOL
 					THEN

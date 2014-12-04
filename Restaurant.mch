@@ -1,5 +1,3 @@
-// VER DUVIDAS DE Dish!
-
 MACHINE			Restaurant(maxprice)
 
 SEES			Dish
@@ -7,16 +5,17 @@ SEES			Dish
 SETS			RESTAURANTS, RESTNAMES, RESTADDRESSSES
 
 VARIABLES		restaurants, address, name, prices, rdishes, rIsVegetarian
+
 INVARIANT
 				rdishes: restaurants <-> dishes & 				
 				restaurants <: RESTAURANTS &
 				address : restaurants --> RESTADDRESSSES & 		
 				name : restaurants --> RESTNAMES &			
 				prices : rdishes --> 0..maxprice &			
-				!(r).(r : dom(rdishes) => (card({r}<|rdishes)) : 5..15)
+				!(r).(r : dom(rdishes) => (card({r}<|rdishes)) : 5..15) &
 				rIsVegetarian : restaurants --> BOOL   
 
-INITIALISATION	restaurants := {}  //todas as listas teem de ser init a vazio ?
+INITIALISATION	restaurants := {} 
 				
 
 OPERATIONS	
@@ -34,27 +33,35 @@ OPERATIONS
 							name <+ {rr |->name} ||
 							address <+ {rr |->addr} ||					
 							rdishes <+ {rr} * dom(list) ||
-							prices <+ (list><rdishes~)~  ||   	//(restaurante,prato),preço
+							prices <+ (list><rdishes~)~  ||   
 							rIsVegetarian <+ {rr|->false}					
 					END;
 				
 			
 				addDishToRestaurant(rr,dd,pp) =
 					PRE		rr: restaurants
-							dd: DISHES
-							pp: 0..maxprice
-							//TODO se dd ja existir em rr faz update price só
-							!(rr).((rr:restaurants) => card({rr}<|rdishes) < 15)
-					
-					THEN	rdishes <+ {rr |-> dd} ||   
-							price <+ {{rr |-> dd} |-> pp}
+							& dd: DISHES
+							& pp: 0..maxprice
+							& (((!(rr).((rr:restaurants) => card({rr}<|rdishes) < 15) ) & 
+							(dd :/ran( {rr} <| rdishes ) )) or (dd :ran( {rr} <| rdishes ) ))
+							
+							
+					THEN	
+							IF		dd :ran( {rr} <| rdishes )
+							
+							THEN	changePrice(rr,dd,pp)
+							
+							ELSE	
+									rdishes <+ {rr |-> dd} ||   
+									price <+ {{rr |-> dd} |-> pp}
+							
 					END;
 					
 				removeDishFromRestaurant(rr, dd) =
 					PRE		rr: restaurants
 							dd: DISHES
 							!(rr).((rr:restaurants) => card({rr}<|rdishes) > 5)
-							//TODO  dd tem de estar no menu de rr e nao so em DISHES
+							dd : ran( {rr} <| rdishes )
 					
 					THEN	{dd} <<| rdishes  ||   
 							prices |>> {dd} 
@@ -84,8 +91,8 @@ OPERATIONS
 				setVegetarianRestaurant(rr, bb) =
 				PRE  rr : restaurants &
 					 bb : BOOL &
-					 ( ({bb} == {true} & !(d) . (d:ran( {rr}<|rdishes ) => isVeg(d)==true) ) ||
-					{bb} == {false} )
+					 ( ( {bb} == {true}) & (!(d) . (d:ran( {rr}<|rdishes ) => isVeg(d)==true) )) or
+					({bb} == {false} )  
 					 
 					
 				THEN  
@@ -107,7 +114,7 @@ OPERATIONS
 						addr := address(rr)
 				END;
 
-				lrr <-- getRestaurantsDish(dd) =            //Returns the list of the names of the restaurants that serve dish dd, if they exist
+				lrr <-- getRestaurantsDish(dd) =            
 				
 				PRE		dd : DISH
 				THEN	
@@ -115,7 +122,7 @@ OPERATIONS
 				END;
 
 
-				ldd <-- getDishRestaurant(rr) // Returns the list of the dishes served in restaurant rr  
+				ldd <-- getDishRestaurant(rr)  
 				PRE 	rr : restaurants
 				
 				THEN	 ldd := rr <| rdishes
@@ -128,3 +135,4 @@ END
 
 
 // f: x -> Y   com  ran(f) = y   no rest
+

@@ -1,4 +1,4 @@
-MACHINE				Tray
+MACHINE		Tray
 
 SEES		Dish, Restaurant			
 
@@ -12,7 +12,7 @@ INVARIANT	trays <: TRAYS &
 			tstatus: trays --> STATUS	&
 			tprice: trays --> NAT	
 			
-INITIALISATION	tdishes := {}
+INITIALISATION	trays := {}
 				
 OPERATIONS	
 				newTrayRest(tr,cc)=
@@ -30,9 +30,11 @@ OPERATIONS
 				addDishtoTray(tr,dd)=
 				
 					PRE		tr : trays &
-							dd : dishes &  //TODO  tem de ser um dd em rdishes
+							dd : dishes & 
+							dd : ran(rdishes) &
 							tstatus(tr) == OPEN	&
-							//TODO dd n pode estar contido nos dishes de tr
+							dd /: ran( {tr} <| tdishes )
+							
 					THEN	tdishes <+ {tr |-> dd}
 					
 					END;
@@ -42,7 +44,8 @@ OPERATIONS
 				removeDishFromTray(tr,dd)=
 				
 					PRE		tr : trays &
-							dd : dishes &  //TODO apenas remover dishes q sejam da tray tr
+							dd : dishes &  
+							dd : ran({tr} <| tdishes) &
 							tstatus(tr) == OPEN
 					
 					THEN	 {dd} <<| tdishes  
