@@ -9,7 +9,7 @@ SETS			RESTAURANTS, RESTNAMES, RESTADDRESSSES
 VARIABLES		restaurants, address, name, prices, rdishes, rIsVegetarian
 				
 INVARIANT
-				rdishes: restaurants <-> dishes   				//será?
+				rdishes: restaurants <-> dishes & 				//será?
 				restaurants <: RESTAURANTS &
 				address : restaurants --> RESTADDRESSSES & 		
 				name : restaurants --> RESTNAMES &			
@@ -17,11 +17,11 @@ INVARIANT
 				!(r).(r : dom(rdishes) => (card({r}<|rdishes)) : 5..15)
 				rIsVegetarian : restaurants --> BOOL   //talvez tirar o bool do dish e meter global
 
-INITIALISATION	restaurants := {}  //todas as listas teem de ser init a vazio
+INITIALISATION	restaurants := {}  //todas as listas teem de ser init a vazio ?
 				
 
 OPERATIONS	
-				newRestaurant(rr, name, addr, list) =
+				newRestaurantRest(rr, name, addr, list) =
 					PRE 	rr: RESTAURANTS
 							& rr /: restaurants
 							& name : RESTNAMES
@@ -40,27 +40,29 @@ OPERATIONS
 					END;
 				
 			
-				addDishToRestaurant(rr,dd,pp) =
+				addDishToRestaurantRest(rr,dd,pp) =
 					PRE		rr: restaurants
 							dd: DISHES
 							pp: 0..maxprice
+							//TODO se dd ja existir em rr faz update price só
 							!(rr).((rr:restaurants) => card({rr}<|rdishes) < 15)
 					
 					THEN	rdishes <+ {rr |-> dd} ||   
 							price <+ {{rr |-> dd} |-> pp}
 					END;
 					
-				removeDishFromRestaurant(rr, dd) =
+				removeDishFromRestaurantRest(rr, dd) =
 					PRE		rr: restaurants
 							dd: DISHES
 							!(rr).((rr:restaurants) => card({rr}<|rdishes) > 5)
+							//TODO  dd tem de estar no menu de rr e nao so em DISHES
 					
 					THEN	{dd} <<| rdishes  ||   
 							prices |>> {dd} 
 					END;
 				
 
-				changePrice(rr,dd,pp) = 
+				changePriceRest(rr,dd,pp) = 
 				PRE {rr |-> dd} : rdishes
 					& pp : 0..maxprice
 				THEN
@@ -80,7 +82,7 @@ OPERATIONS
 				END;
 
 				
-				setVegetarianTrue(rr) =
+				setVegetarianTrueRest(rr) =
 					PRE 
 						!(d) . (d:ran( {rr}<|rdishes ) => isVeg(d)==true)   // == ?
 					THEN
@@ -94,7 +96,7 @@ OPERATIONS
 					END;
 					
 					
-				setVegetarianRestaurant(rr, bb) =
+				setVegetarianRestaurantRest(rr, bb) =
 				PRE  rr : restaurants &
 					 bb : BOOL & 
 					 
@@ -108,19 +110,19 @@ OPERATIONS
 				
 				
 
-				name <-- getRestaurantName(rr) =
+				name <-- getRestaurantNameRest(rr) =
 				PRE rr : restaurants
 				THEN
 					name := name(rr)
 				END;
 
-				addr <-- getRestaurantAddress(rr) =
+				addr <-- getRestaurantAddressRest(rr) =
 				PRE 	rr : restaurants
 				THEN
 						addr := address(rr)
 				END;
 
-				lrr <-- getRestaurantsDish(dd) =            //Returns the list of the names of the restaurants that serve dish dd, if they exist
+				lrr <-- getRestaurantsDishRest(dd) =            //Returns the list of the names of the restaurants that serve dish dd, if they exist
 				
 				PRE		dd : DISH
 				THEN	
@@ -128,7 +130,7 @@ OPERATIONS
 				END;
 
 
-				ldd <-- getDishRestaurant(rr) // Returns the list of the dishes served in restaurant rr  
+				ldd <-- getDishRestaurantRest(rr) // Returns the list of the dishes served in restaurant rr  
 				PRE 	rr : restaurants
 				
 				THEN	 ldd := rr <| rdishes

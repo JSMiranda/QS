@@ -14,10 +14,11 @@ INVARIANT			dishes <: DISHES &
 INITIALISATION		dishes := {} 
 
 OPERATIONS
-					newDish(dd, name, desc, bool) =   
+					newDishRest(dd, name, desc, bool) =   
 					PRE dd : DISHES
 						& dd /: dishes
 						& name : NAMES
+						& name /: names  //TODO tá mal é preciso nao estar nos ran da funçao name
 						& desc : DESCRIPTIONS
 						& bool : BOOL
 					THEN
@@ -27,71 +28,39 @@ OPERATIONS
 						bool <+ {dd |-> bool}
 					END;
 
-					removeDish(dd) =
+					removeDishRest(dd) =
 					PRE dd : dishes &
                         dd :/ rdishes &
                         dd :/ tdishes
 					THEN
-						dishes := dishes - {dd} ||
+						dishes := dishes - {dd} ||  
 						{dd} <<| name			||
 						{dd} <<| description	||
 						{dd} <<| bool
 					END;
 
 					
-					name <-- getDishName(dd) =
-					PRE dd : dishes            // ou DISHES e "lançar excepcao" caso /: a dishes ?
+					name <-- getDishNameRest(dd) =
+					PRE dd : dishes            
 					THEN
 						name := name(dd)
 					END;
 
-					desc <-- getDishDescription(dd) =
+					desc <-- getDishDescriptionRest(dd) =
 					PRE dd : dishes
 					THEN
 						desc := description(dd)
 					END;
 
-					bb <-- isVegetarianDish(dd) =
+					bb <-- isVegetarianDishRest(dd) =
 					PRE dd : dishes
 					THEN
 						bb := isVegetarian(dd)
 					END
 					
-					newRestaurant(rr, name, addr, ldish, lprice) =
-					PRE 	rr: RESTAURANTS
-							& rr /: restaurants
-							& name : RESTNAMES
-							& addr : RESTADRESSES
-							& card(ldishes): {5..15}    //not sure
-							& !(p).(p : lprice) => p : {0..maxprice}  //not sure			
-					THEN
-							restaurants: restaurants \/ {rr} ||
-							name <+ {rr |->name} ||
-							address <+ {rr |->addr} ||
-							rdishes: rdishes ^ ldish ||							// n deve ser isto pois rdishes é um par restaurante/dish e ldish sao so pratos
-							prices          // no clue como manusear as lista combinada de restaurantes-dishes e associar um preço aos vares
-							
 					
-					END;
 				
 			
-				addDishToRestaurant(rr,dd,pp) =
-					PRE		rr: restaurants
-							dd: DISHES
-							pp: {0..maxprice}
-							!(rr).(rr:restaurants) => ran(card(rdishes)) < 15    //prob wrong, n permitir adição qd size da lista for =15
-					
-					THEN	//rdishes + o par(rr,dd)    again, como manusear a lista combinada? 
-					
-					END;
-					
-				removeDishFromRestaurant(rr, dd) =
-					PRE		rr: restaurants
-							dd: DISHEs
-							!(rr).(rr:restaurants) => ran(card(rdishes)) > 5    //prob wrong again
-					
-					THEN	//rdishes - o par (rr,dd)       idem
-					
-					END;
+				
 
 END
