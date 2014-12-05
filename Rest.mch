@@ -1,90 +1,104 @@
-MACHINE				Rest
+MACHINE		Tray
 
-INCLUDES			Dish, Tray, Restaurant(20)	    
+SEES		Restaurant,Dish		
 
-VARIABLES			tDish, tRestaurant, tTray
+SETS		TRAYS; STATUS = {OPEN,CLOSED,PAID}; CLIENTS		
 
-INVARIANT			tDish <: DISHES &
-					   tRestaurant <: RESTAURANTS &
-					   tTray <: TRAYS &
-					   ran(rdishes)= dishes &
-					   ran(tdishes)=dishes
-					   
-					  
-					  
-					
-INITIALISATION tDish:= {} || tRestaurant:= {} || tTray:= {}
+VARIABLES	tdishes, tclient, tstatus, trays, tprice
 
+INVARIANT	trays <: TRAYS &
+			tdishes: trays <-> DISHES &		   
+			tclient: trays --> CLIENTS &
+			tstatus: trays --> STATUS	&
+			tprice: trays --> NAT	
+			
+INITIALISATION	tdishes := {} || tclient:= {} || tstatus:= {} || trays:= {} || tprice:= {}
+				
+OPERATIONS	
+				newTrayRest(tr,cc)=
+					PRE		tr: TRAYS &
+					        cc: CLIENTS
 					
-PROMOTES			getDishName, getDishDescription, isVegetarianDish,
-					addDishToRestaurant, removeDishFromRestaurant, changePrice,
-					getDishPrice, setVegetarianRestaurant, isVegetarianRestaurant,
-					getRestaurantName, getRestaurantAddress, getRestaurantsDish,
-					getDishRestaurant, addDishToTray, removeDishFromTray, payTray,
-					cancelTray, computePriceOfTray
+					THEN	trays := trays \/ {tr}	||
+							tstatus:= tstatus <+ {tr |->OPEN} ||
+							tclient:= tclient <+ {tr |-> cc}	||
+							tprice:= tprice  <+ {tr|->0}
 					
-OPERATIONS		
-					newDish(name,desc,bb) = 
-					
-						PRE name:NAMES &
-						    desc:DESCRIPTIONS &
-						    bb: BOOLTF 
-						
-						THEN    
-						          
-						    ANY     tt   
-						    WHERE   tt:DISHES & tt /:tDish
-						        
-						    THEN    newDishRest(tt,name,desc,bb) ||
-						            tDish:= tDish \/ {tt}
-						    END	
-						END;
-					
+					END;
+				
+				
+				
+				addDishToTray(tr,dd)=
+				
+					PRE		tr : trays &
+							dd : dishes & 
+							dd : ran(rdishes) &
+							tstatus(tr) = OPEN	&
+							dd /: ran( {tr} <| tdishes )
 							
+					THEN	tdishes:= tdishes <+ {tr |-> dd}
 					
-					newRestaurant(name,addr,list) =
+					END;
+							
+				
+				
+				removeDishFromTray(tr,dd)=
+				
+					PRE		tr : trays &
+							dd : dishes &  
+							dd : ran({tr} <| tdishes) &
+							tstatus(tr) = OPEN
 					
-						PRE    name: RESTNAMES &
-						       addr:RESTADDRESSES &
-						       list : DISHES <-> NAT
+					THEN	 tdishes:=  tdishes  |>> {dd}
 					
-						THEN
-						        ANY     tt   
-						        WHERE   tt:RESTAURANTS & tt /:tRestaurant
-						        THEN    newRestaurantRest(tt,name,addr,list) ||
-							             tRestaurant:= tRestaurant \/ {tt}
-							     END
-						  
-						END;
-					
-					newTray(cc)=
-						PRE    cc:CLIENTS
-						
-		                THEN	  
-		                   ANY     tt   
-						        WHERE   tt:TRAYS & tt /:tTray
-						        THEN    newTrayRest(tt,cc) ||
-							             tTray:= tTray \/ {tt}
-							            
-							     END
-								
-						END;
-						
-						removeDish(dd) =
-					PRE dd : dishes &
-						 dd /: ran(rdishes) &
-						 dd /: ran(tdishes)
-					THEN
-						removeDishRest(dd)
 					END;
 					
-
+				checkOutTray(tr) =
+					
+					PRE		tr : trays &
+							tstatus(tr) = OPEN
+					
+					THEN	tstatus(tr) :=CLOSED
+					
+					END;
+				
+				
+				
+				payTray(tr) =
+				
+					PRE		tr : trays	&
+							tstatus(tr) = CLOSED
+					
+					THEN tprice(tr):= SIGMA(dish).(dish : ran({tr} <| tdishes)  | min(  //compute price
+	     {rprice|!(rr).(rr:restaurants => rprice = prices(rr,dish))} )) ||
+							tstatus:= tstatus <+ {tr |->PAID} 
+					
+					END;
+					
+					
+				cancelTray(tr) =
+				
+					PRE		( tstatus(tr) = CLOSED) or (tstatus(tr) = OPEN) &
+					        tr: TRAYS
+					
+					THEN	
+							trays := trays - {tr}	||		
+							tdishes:={tr} <<| tdishes	 ||
+							tstatus:={tr} <<| tstatus	 ||
+							tclient:= {tr} <<| tclient ||
+							tprice:= {tr} <<| tprice		
+							
+					END;
+					
+				pp<--computePriceOfTray(tr) = 
+					
+					PRE	pp : NAT &
+						    tr: trays
+					
+	THEN	pp:= SIGMA(dish).(dish : ran({tr} <| tdishes)  | min(
+	     {rprice|!(rr).(rr:restaurants => rprice = prices(rr,dish))} ))
+					
+					END
+				
 
 END
-					
-			
-			
-					
-					
-			
-					

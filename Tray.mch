@@ -69,9 +69,9 @@ OPERATIONS
 					PRE		tr : trays	&
 							tstatus(tr) = CLOSED
 					
-					THEN	//pp := computePriceofTrayRest(tr) ||
-							tstatus:= tstatus <+ {tr |->PAID} ||
-							tprice(tr):= 0 //pp
+					THEN tprice(tr):= SIGMA(dish).(dish : ran({tr} <| tdishes)  | min(  //compute price
+	     {rprice|!(rr).(rr:restaurants => rprice = prices(rr,dish))} )) ||
+							tstatus:= tstatus <+ {tr |->PAID} 
 					
 					END;
 					
@@ -95,11 +95,10 @@ OPERATIONS
 					PRE	pp : NAT &
 						    tr: trays
 					
-					THEN	tr:=tr
+	THEN	pp:= SIGMA(dish).(dish : ran({tr} <| tdishes)  | min(
+	     {rprice|!(rr).(rr:restaurants => rprice = prices(rr,dish))} ))
 					
 					END
-				//sigma x. (x pertence S) f(x) 
-				//sigma dd . (dd pertence ldd | min (S))
 				
 
 END
