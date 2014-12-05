@@ -1,104 +1,155 @@
-MACHINE		Tray
+MACHINE			Restaurant(maxprice)
 
-SEES		Restaurant,Dish		
+SEES			Dish
 
-SETS		TRAYS; STATUS = {OPEN,CLOSED,PAID}; CLIENTS		
+SETS			RESTAURANTS; RESTNAMES; RESTADDRESSES
 
-VARIABLES	tdishes, tclient, tstatus, trays, tprice
+VARIABLES		restaurants, address, rnames, prices, rdishes, rIsVegetarian
 
-INVARIANT	trays <: TRAYS &
-			tdishes: trays <-> DISHES &		   
-			tclient: trays --> CLIENTS &
-			tstatus: trays --> STATUS	&
-			tprice: trays --> NAT	
-			
-INITIALISATION	tdishes := {} || tclient:= {} || tstatus:= {} || trays:= {} || tprice:= {}
+INVARIANT			
+				restaurants <: RESTAURANTS &
+				rdishes: restaurants <-> DISHES & 
+				address : restaurants --> RESTADDRESSES & 		
+				rnames : restaurants --> RESTNAMES &			
+				prices : rdishes --> 0..maxprice &			
+				!(rr).(rr : dom(rdishes) => (card({rr}<|rdishes)) : 5..15) &
+				rIsVegetarian : restaurants --> BOOLTF
+
+INITIALISATION    restaurants := {} || rdishes:= {} || address := {} || rnames:= {} || 
+                  prices:= {} || rIsVegetarian:= {}
+    
+CONSTRAINTS    maxprice: NAT
 				
+
 OPERATIONS	
-				newTrayRest(tr,cc)=
-					PRE		tr: TRAYS &
-					        cc: CLIENTS
-					
-					THEN	trays := trays \/ {tr}	||
-							tstatus:= tstatus <+ {tr |->OPEN} ||
-							tclient:= tclient <+ {tr |-> cc}	||
-							tprice:= tprice  <+ {tr|->0}
-					
-					END;
-				
-				
-				
-				addDishToTray(tr,dd)=
-				
-					PRE		tr : trays &
-							dd : dishes & 
-							dd : ran(rdishes) &
-							tstatus(tr) = OPEN	&
-							dd /: ran( {tr} <| tdishes )
+				newRestaurantRest(rr, name, addr, list) =
+					PRE 	rr: RESTAURANTS
+							& rr /: restaurants
+							& name : RESTNAMES
+							& addr : RESTADDRESSES
+							& list : DISHES <-> NAT
+							& !(dd).((dd : dom(list)) => dd : DISHES)
+							& !(pp).((pp : ran(list)) => pp : 0..maxprice)  	
+							& card(list): 5..15    
+									
+					THEN
+							restaurants:= restaurants \/ {rr} ||
+							rnames:= rnames <+ {rr |->name} ||
+							address:= address <+ {rr |->addr} ||					
+							rdishes:= rdishes <+ {rr} * dom(list) ||
 							
-					THEN	tdishes:= tdishes <+ {tr |-> dd}
-					
+							prices:= prices <+ {xx,yy,zz | xx,yy:rdishes & yy,zz:list} ||   
+							rIsVegetarian:= rIsVegetarian <+ {rr|->false}					
 					END;
-							
+			
 				
-				
-				removeDishFromTray(tr,dd)=
-				
-					PRE		tr : trays &
-							dd : dishes &  
-							dd : ran({tr} <| tdishes) &
-							tstatus(tr) = OPEN
-					
-					THEN	 tdishes:=  tdishes  |>> {dd}
-					
-					END;
-					
-				checkOutTray(tr) =
-					
-					PRE		tr : trays &
-							tstatus(tr) = OPEN
-					
-					THEN	tstatus(tr) :=CLOSED
-					
-					END;
-				
-				
-				
-				payTray(tr) =
-				
-					PRE		tr : trays	&
-							tstatus(tr) = CLOSED
-					
-					THEN tprice(tr):= SIGMA(dish).(dish : ran({tr} <| tdishes)  | min(  //compute price
-	     {rprice|!(rr).(rr:restaurants => rprice = prices(rr,dish))} )) ||
-							tstatus:= tstatus <+ {tr |->PAID} 
-					
-					END;
-					
-					
-				cancelTray(tr) =
-				
-					PRE		( tstatus(tr) = CLOSED) or (tstatus(tr) = OPEN) &
-					        tr: TRAYS
-					
+			
+				addDishToRestaurant(rr,dd,pp) =
+					PRE	rr: restaurants
+							& dd: DISHES
+							& pp: 0..maxprice
+							& (((!(rr).((rr:restaurants) => card({rr}<|rdishes) < 15) ) & 
+							(dd /:ran( {rr} <| rdishes ) ))or (dd :ran( {rr} <| rdishes ) ))
 					THEN	
-							trays := trays - {tr}	||		
-							tdishes:={tr} <<| tdishes	 ||
-							tstatus:={tr} <<| tstatus	 ||
-							tclient:= {tr} <<| tclient ||
-							tprice:= {tr} <<| tprice		
+							IF		dd :ran( {rr} <| rdishes )
+							
+							THEN		prices(rr,dd) := pp
+							
+							ELSE	
+									rdishes:= rdishes <+ {rr |-> dd} ||   
+									prices(rr,dd) := pp
+							END
 							
 					END;
 					
-				pp<--computePriceOfTray(tr) = 
+				removeDishFromRestaurant(rr, dd) =
+					PRE	  rr: restaurants &
+							  dd: DISHES &
+							  !(rr).((rr:restaurants) => card({rr}<|rdishes) > 5) &
+							  dd : ran( {rr} <| rdishes )
 					
-					PRE	pp : NAT &
-						    tr: trays
-					
-	THEN	pp:= SIGMA(dish).(dish : ran({tr} <| tdishes)  | min(
-	     {rprice|!(rr).(rr:restaurants => rprice = prices(rr,dish))} ))
-					
-					END
+	            THEN	
+	                 rdishes:=  rdishes|>>{dd}   ||   
+						   prices:=  {rr|->dd} <<|  prices
+					END;
 				
 
+						
+				changePrice(rr,dd,pp) = 
+				
+				PRE 
+				    rr: restaurants &
+				    dd: DISHES &
+				    rr |-> dd : rdishes&
+					 pp : 0..maxprice
+				THEN
+					prices(rr,dd) := pp
+				END;
+				
+				
+				
+
+				pp <-- getDishPrice(rr, dd) =
+				PRE rr |-> dd : rdishes
+				THEN
+					pp := prices(rr,dd)
+				END;
+				
+
+				bb <-- isVegetarianRestaurant(rr) =
+				PRE rr : restaurants
+				THEN
+					bb := rIsVegetarian(rr)
+				END;
+				
+					
+				setVegetarianRestaurant(rr, bb) =
+				PRE  rr : restaurants &
+					  bb : BOOLTF &
+					  ((bb = true  &
+					  !(dd) . (dd:ran( {rr}<|rdishes ) => isVegetarian(dd)=true)) 
+			        or bb= false ) 
+					 
+					
+				THEN  
+						rIsVegetarian(rr) := bb
+					 
+				END;
+				
+				
+
+				name <-- getRestaurantName(rr) =
+				PRE rr : restaurants
+				THEN
+					name := rnames(rr)
+				END;
+				
+
+				addr <-- getRestaurantAddress(rr) =
+				PRE 	rr : restaurants
+				THEN
+						addr := address(rr)
+				END;
+
+				lrr <-- getRestaurantsDish(dd) =            
+				
+				PRE		dd : DISHES
+				THEN	
+						lrr :=ran(dom( (rdishes |> {dd}) ) <| rnames)
+				END;
+
+
+				ldd <-- getDishRestaurant(rr) =
+				PRE 	rr : restaurants
+				
+				THEN	 ldd := {rr} <| rdishes
+				
+				END
+				
+				
 END
+
+
+
+
+
