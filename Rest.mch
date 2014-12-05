@@ -47,11 +47,19 @@ OPERATIONS
 						THEN	newTrayRest(token,cc) ||
 								token := token + 1
 					
-						END
+						END;
+						
+						removeDish(dd) =
+					PRE dd : dishes &
+						dd /: rdishes &
+						dd /: tdishes
+					THEN
+						removeDishRest(dd)
+					END;
 END
 					
-						
-						
+			
+	// f: x -> Y   com  ran(f) = y   no rest					
 					
 					
 			

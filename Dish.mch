@@ -1,47 +1,55 @@
+
 MACHINE				Dish
 
-SETS				DISHES, NAMES, DESCRIPTIONS, BOOL = {true, false}
+SETS				   DISHES; NAMES; DESCRIPTIONS; BOOLTF = {true, false}
 
-VARIABLES			dishes,	description, name, isVegetarian
+VARIABLES			dishes,	description, names, isVegetarian
 
 INVARIANT			dishes <: DISHES &         
-					description : dishes --> DESCRIPTIONS &
-					name : dishes --> NAMES &				 
-					isVegetarian : dishes --> BOOL 
+					   description : dishes --> DESCRIPTIONS &
+					   names : dishes --> NAMES &				 
+					   isVegetarian : dishes --> BOOLTF
 					
-INITIALISATION		dishes := {} 
+INITIALISATION		dishes := {} || description := {} || names := {}
+                    || isVegetarian := {}
 
 OPERATIONS
-					newDishRest(dd, name, desc, bool) =   
+					newDishRest(dd, name, desc, bb) =   
 					PRE dd : DISHES
 						& dd /: dishes
 						& name : NAMES
-						& name /: ran(name(dd))  
+						& name /: ran(names)  
 						& desc : DESCRIPTIONS
-						& bool : BOOL
+						& bb : BOOLTF
 					THEN
 						dishes := dishes \/ {dd} ||
-						name <+ {dd |-> name} ||
-						description <+ {dd |-> desc} ||
-						bool <+ {dd |-> bool}
+						names := names <+ {dd |-> name} ||
+						description := description <+ {dd |-> desc} ||
+						isVegetarian := isVegetarian <+ {dd |-> bb}
 					END;
 
-					removeDish(dd) =
-					PRE dd : dishes &
-                        dd :/ rdishes &
-                        dd :/ tdishes
+
+
+
+
+
+
+
+					removeDishRest(dd) =
+					PRE dd : dishes 
+                    
 					THEN
 						dishes := dishes - {dd} ||  
-						{dd} <<| name			||
-						{dd} <<| description	||
-						{dd} <<| bool
+						names := {dd} <<| names			||
+						description := {dd} <<| description	||
+						isVegetarian:= {dd} <<| isVegetarian
 					END;
 
 					
 					name <-- getDishName(dd) =
 					PRE dd : dishes            
 					THEN
-						name := name(dd)
+						name := names(dd)
 					END;
 
 					desc <-- getDishDescription(dd) =
