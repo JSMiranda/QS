@@ -28,7 +28,7 @@ OPERATIONS
 				
 				
 				
-				addDishtoTray(tr,dd)=
+				addDishToTray(tr,dd)=
 				
 					PRE		tr : trays &
 							dd : dishes & 

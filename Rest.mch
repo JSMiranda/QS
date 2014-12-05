@@ -1,65 +1,89 @@
 MACHINE				Rest
 
-INCLUDES			Dish, Tray, Restaurant
-
-SETS				TOKENS : NAT    
+INCLUDES			Dish, Tray, Restaurant(20)	    
 
 VARIABLES			tDish, tRestaurant, tTray
 
-INVARIANT			tDish : DISH &
-					tRestaurant : RESTAURANTS &
-					tTray: TRAYS
+INVARIANT			tDish <: DISHES &
+					   tRestaurant <: RESTAURANTS &
+					   tTray <: TRAYS &
+					   ran(rdishes)= dishes &
+					   ran(tdishes)=dishes
+					   
+					  
+					  
 					
-INITIALISATION		
+INITIALISATION tDish:= {} || tRestaurant:= {} || tTray:= {}
+
 					
-					
-PROMOTES			removeDish, getDishName, getDishDescription, isVegetarianDish,
+PROMOTES			getDishName, getDishDescription, isVegetarianDish,
 					addDishToRestaurant, removeDishFromRestaurant, changePrice,
 					getDishPrice, setVegetarianRestaurant, isVegetarianRestaurant,
-					getRestaurantName, getRestaurantAdress, getRestaurantDish,
-					getDishRestaurant, addDishTOTray, removeDishFromTray, payTray,
+					getRestaurantName, getRestaurantAddress, getRestaurantsDish,
+					getDishRestaurant, addDishToTray, removeDishFromTray, payTray,
 					cancelTray, computePriceOfTray
 					
-
 OPERATIONS		
-					newDish(name,desc,bool) = 
+					newDish(name,desc,bb) = 
 					
-						PRE
-					
-						THEN
-								newDishRest(token,name,desc,bool) ||
-								token := token + 1   ta mal
+						PRE name:NAMES &
+						    desc:DESCRIPTIONS &
+						    bb: BOOLTF 
+						
+						THEN    
+						          
+						    ANY     tt   
+						    WHERE   tt:DISHES & tt /:tDish
+						        
+						    THEN    newDishRest(tt,name,desc,bb) ||
+						            tDish:= tDish \/ {tt}
+						    END	
 						END;
 					
 							
 					
 					newRestaurant(name,addr,list) =
 					
-						PRE
+						PRE    name: RESTNAMES &
+						       addr:RESTADDRESSES &
+						       list : DISHES <-> NAT
 					
-						THEN	newRestaurantRest(token,name,addr,list) ||
-								token := token +1
+						THEN
+						        ANY     tt   
+						        WHERE   tt:RESTAURANTS & tt /:tRestaurant
+						        THEN    newRestaurantRest(tt,name,addr,list) ||
+							             tRestaurant:= tRestaurant \/ {tt}
+							     END
+						  
 						END;
 					
 					newTray(cc)=
-						PRE
+						PRE    cc:CLIENTS
 						
-						THEN	newTrayRest(token,cc) ||
-								token := token + 1
-					
+		                THEN	  
+		                   ANY     tt   
+						        WHERE   tt:TRAYS & tt /:tTray
+						        THEN    newTrayRest(tt,cc) ||
+							             tTray:= tTray \/ {tt}
+							            
+							     END
+								
 						END;
 						
 						removeDish(dd) =
 					PRE dd : dishes &
-						dd /: rdishes &
-						dd /: tdishes
+						 dd /: ran(rdishes) &
+						 dd /: ran(tdishes)
 					THEN
 						removeDishRest(dd)
 					END;
+					
+
+
 END
 					
 			
-	// f: x -> Y   com  ran(f) = y   no rest					
+			
 					
 					
 			
