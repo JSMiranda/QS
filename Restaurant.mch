@@ -14,6 +14,7 @@ INVARIANT
 				prices : rdishes --> 0..maxprice &			
 				!(rr).(rr : dom(rdishes) => (card({rr}<|rdishes)) : 5..15) &
 				rIsVegetarian : restaurants --> BOOLTF 
+			
 				
 				
 INITIALISATION    restaurants := {} || rdishes:= {} || address := {} || rnames:= {} || 
@@ -47,7 +48,7 @@ OPERATIONS
 			
 				addDishToRestaurant(rr,dd,pp) =
 					PRE	rr: restaurants
-							& dd: DISHES
+							& dd: dishes
 							& pp: 0..maxprice
 							& (((!(rr).((rr:restaurants) => card({rr}<|rdishes) < 15) ) & 
 							(dd /:ran( {rr} <| rdishes ) ))or (dd :ran( {rr} <| rdishes ) )) &

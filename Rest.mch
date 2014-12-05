@@ -7,8 +7,9 @@ VARIABLES			tDish, tRestaurant, tTray
 INVARIANT			tDish <: DISHES &
 					   tRestaurant <: RESTAURANTS &
 					   tTray <: TRAYS &
-					   ran(rdishes)= dishes &
-					   ran(tdishes)=dishes
+					   ran(rdishes) <:dishes &
+					   ran(tdishes) <:dishes &
+					   (rr,d1,d2).( (rr : restaurants) & ({d1,d2}<:ran({rr} <| rdishes))&(d1 /= d2)  => names(d1) /= names(d2)
 					   
 					  
 					  
@@ -73,7 +74,7 @@ OPERATIONS
 						removeDish(dd) =
 					PRE dd : dishes &
 						 dd /: ran(rdishes) &
-						 dd /: ran(tdishes)
+						 (dd /: ran(tdishes) or  !(tr).(tr: dom(tdishes |> {dd}) => tstatus(tr) /=PAID))
 					THEN
 						removeDishRest(dd)
 					END;
