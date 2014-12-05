@@ -21,8 +21,7 @@ OPERATIONS
 					
 					THEN	trays := trays \/ {tr}	||
 							tstatus:= tstatus <+ {tr |->OPEN} ||
-							tclient:= tclient <+ {tr |-> cc}	||
-							tprice:= tprice  <+ {tr|->0}
+							tclient:= tclient <+ {tr |-> cc}	
 					
 					END;
 				
@@ -71,7 +70,7 @@ OPERATIONS
 					
 					THEN tprice(tr):= SIGMA(dish).(dish : ran({tr} <| tdishes)  | min(  //compute price
 	     {rprice|!(rr).(rr:restaurants => rprice = prices(rr,dish))} )) ||
-							tstatus:= tstatus <+ {tr |->PAID} 
+							tstatus(tr):= PAID
 					
 					END;
 					

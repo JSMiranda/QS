@@ -13,8 +13,9 @@ INVARIANT
 				rnames : restaurants --> RESTNAMES &			
 				prices : rdishes --> 0..maxprice &			
 				!(rr).(rr : dom(rdishes) => (card({rr}<|rdishes)) : 5..15) &
-				rIsVegetarian : restaurants --> BOOLTF
-
+				rIsVegetarian : restaurants --> BOOLTF 
+				
+				
 INITIALISATION    restaurants := {} || rdishes:= {} || address := {} || rnames:= {} || 
                   prices:= {} || rIsVegetarian:= {}
     
@@ -49,7 +50,10 @@ OPERATIONS
 							& dd: DISHES
 							& pp: 0..maxprice
 							& (((!(rr).((rr:restaurants) => card({rr}<|rdishes) < 15) ) & 
-							(dd /:ran( {rr} <| rdishes ) ))or (dd :ran( {rr} <| rdishes ) ))
+							(dd /:ran( {rr} <| rdishes ) ))or (dd :ran( {rr} <| rdishes ) )) &
+                    ((isVegetarian(dd)=true & rIsVegetarian(rr)=true) or
+							rIsVegetarian(rr)=false) &
+		            	!(ddd).(ddd: ran({rr} <| rdishes) => getDishName(dd) /= getDishName(ddd))
 					THEN	
 							IF		dd :ran( {rr} <| rdishes )
 							
