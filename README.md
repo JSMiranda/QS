@@ -1,3 +1,3 @@
 QS
 ==
-Project for Software Quality 2013/2014: Abstract machines in B. Validation with Atelier B.
+Project for Software Quality 2014/2015: Abstract machines in B. Validation with Atelier B.
